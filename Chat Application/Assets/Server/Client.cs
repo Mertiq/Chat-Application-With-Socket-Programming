@@ -16,8 +16,6 @@ public class Client : MonoBehaviour
     NetworkStream networkStream;
     BinaryWriter binaryWriter;
     BinaryReader binaryReader;
-    string host = "127.0.0.1";
-    int port = 5000;
 
     [Header("Client Things")]
     List<GameObject> messages = new List<GameObject>();
@@ -38,7 +36,6 @@ public class Client : MonoBehaviour
         }
     }
 
-
     public void ConnectToServer()
     {
         if (socketReady)
@@ -53,7 +50,6 @@ public class Client : MonoBehaviour
             socketReady = true;
 
         }
-
     }
 
 }

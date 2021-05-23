@@ -78,7 +78,6 @@ public class Server : MonoBehaviour
             return false;
         }
     }
-
 }
 
 public class ServerClient

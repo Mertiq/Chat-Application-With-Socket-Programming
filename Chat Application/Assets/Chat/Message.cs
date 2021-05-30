@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Message
 {
-    public enum MessageType { Name, ContactInformation, SendChatMessage, CreateChat, AllChatMessages}
+    public enum MessageType { Name, ContactInformation, SendChatMessage, CreateChat, AllChatMessages, ChatsInformation}
 
     public string content;
     public int fromClientID;

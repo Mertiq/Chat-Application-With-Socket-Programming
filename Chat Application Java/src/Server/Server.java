@@ -6,7 +6,6 @@
 package Server;
 
 import Chat.Chat;
-import Chat.ChatRoom;
 import Client.FakeClient;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -34,11 +33,14 @@ public class Server {
     public static ArrayList<ServerClient> clients = new ArrayList<>();
     public static ArrayList<Chat> chats = new ArrayList<>();
     
+    ///<summary>
+    ///Starts thread
+    ///</summary>
+    ///<param port>port that client will connect</param>
     public static void Start(int port) {
         try {
             Server.port = port;
             Server.serverSocket = new ServerSocket(Server.port);
-
             Server.runThread = new ServerThread();
             Server.runThread.start();
             System.out.println("Server started!");
@@ -48,6 +50,11 @@ public class Server {
         }
     }
 
+    ///<summary>
+    ///Sends message to client
+    ///</summary>
+    ///<param client>the client</param>
+    ///<param message>the message</param>
     public static void Send(ServerClient client, Message message) {
 
         try {
@@ -59,6 +66,10 @@ public class Server {
 
     }
 
+    ///<summary>
+    ///Sends message to everyone
+    ///</summary>
+    ///<param message>the message</param>
     public static void Send(Message message) {
 
         for (ServerClient client : Server.clients) {
@@ -73,6 +84,10 @@ public class Server {
 
     }
 
+    ///<summary>
+    ///Sends clients infos to client
+    ///</summary>
+    ///<param _client>the client</param>
     public static void ShowClients(ServerClient _client) {
 
         ArrayList<FakeClient> _clients = new ArrayList<>();
@@ -86,7 +101,10 @@ public class Server {
 
     }
     
-
+    ///<summary>
+    ///Sends chats infos to client
+    ///</summary>
+    ///<param _client>the client</param>
     public static void ShowChats(ServerClient _client) {
 
         for (Chat chat : chats) {
@@ -96,6 +114,11 @@ public class Server {
         }
     }
 
+    ///<summary>
+    ///Creates chat
+    ///</summary>
+    ///<param clientID1>first client</param>
+    ///<param clientID2>secoond client</param>
     public static void CreateChat(int clientID1, int clientID2) {
 
         ServerClient sc1 = null;
@@ -111,19 +134,16 @@ public class Server {
         }
 
         if (sc1 != null && sc2 != null) {
-            if (chats.size() == 0) {
+            if (chats.isEmpty()) {
                 Chat chat = new Chat(sc1, sc2, chatID);
                 chats.add(chat);
                 chatID++;
-                System.out.println("Chat created");
             } else {
                 found=false;
                 for (int i = 0; i < chats.size(); i++) {
                     if ((chats.get(i).clients.get(0) == sc1 && chats.get(i).clients.get(1) == sc2) || (chats.get(i).clients.get(0) == sc2 && chats.get(i).clients.get(1) == sc1)) {
                        
                         Send(sc1, new Message(0,Message_Type.GetMessagesInfo, chats.get(i).messages));
-                        
-                        System.out.println("Chat already created");
                         found=true;
                         break;
                     }
@@ -133,17 +153,19 @@ public class Server {
                     Chat chat = new Chat(sc1, sc2, chatID);
                     chats.add(chat);
                     chatID++;
-                    System.out.println("Chat created");
                     
                 }
             }
         }
     }
     
+    ///<summary>
+    ///Sends chat message
+    ///</summary>
+    ///<param message>the message</param>
     public static void SendChatMessage(Message message){
         ServerClient sc1 = null;
         ServerClient sc2 = null;
-        boolean found = false;
 
         for (ServerClient client : Server.clients) {
             if (client.id == message.fromClientID) {

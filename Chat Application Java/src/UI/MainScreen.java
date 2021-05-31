@@ -5,13 +5,10 @@
  */
 package UI;
 
-import Chat.ChatRoom;
 import Client.Client;
 import Client.FakeClient;
 import Message.Message;
 import Message.Message.Message_Type;
-import Server.Server;
-import Server.ServerClient;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,9 +45,11 @@ public class MainScreen extends javax.swing.JFrame {
     public MainScreen() {
         initComponents();
         
-        
-            contactList.addListSelectionListener(new ListSelectionListener() {
-       
+        ///<summary>
+        ///When the contacts value change it runs and sets selected client as it is.
+        ///</summary>
+        contactList.addListSelectionListener(new ListSelectionListener() {
+
             @Override
             public void valueChanged(ListSelectionEvent event) {
                 if (!event.getValueIsAdjusting()){
@@ -65,10 +64,18 @@ public class MainScreen extends javax.swing.JFrame {
             }
         });
         
-        
-      
     }
     
+    public void setClient(Client _client){
+        thisClientID = _client.id;
+        thisClientName = _client.name;
+        client=_client;
+    }
+    
+    ///<summary>
+    ///Shows clients name in list
+    ///</summary>
+    ///<param _clients>clients list</param>
     public void ShowContacts(ArrayList<FakeClient> _clients){
         
         DefaultListModel dlm = new DefaultListModel();
@@ -78,17 +85,14 @@ public class MainScreen extends javax.swing.JFrame {
             dlm.addElement(_client.id + "-" + _client.name);
         }
         
-        contactList.setModel(dlm); 
-        
+        contactList.setModel(dlm);
         senderNameLabel.setText(client.name);
     }
    
-    public void setClient(Client _client){
-        thisClientID = _client.id;
-        thisClientName = _client.name;
-        client=_client;
-    }
-    
+    ///<summary>
+    ///Shows messages in text area
+    ///</summary>
+    ///<param messages>messages list</param>
     public void ShowMessages(ArrayList<Message> messages){
         String fullText = "";
         for (Message message : messages) {
@@ -166,16 +170,16 @@ public class MainScreen extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(receiverNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(senderNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(receiverNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(senderNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(inputMessageField, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -187,32 +191,33 @@ public class MainScreen extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(receiverNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(senderNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(15, 15, 15)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(receiverNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(senderNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 307, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(sendFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                            .addComponent(inputMessageField, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sendMessageButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(46, 46, 46))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(sendMessageButton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(inputMessageField)
+                            .addComponent(sendFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane1))
+                .addGap(368, 368, 368))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    ///<summary>
+    ///Sends message
+    ///</summary>
     private void sendMessageButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendMessageButtonMouseClicked
         // TODO add your handling code here:
        
@@ -221,8 +226,12 @@ public class MainScreen extends javax.swing.JFrame {
             client.Send(new Message(thisClientID,Integer.parseInt(splitedString[0]),Message.Message_Type.SendChatMessage, inputMessageField.getText()));
             inputMessageField.setText("");
         }
+        
     }//GEN-LAST:event_sendMessageButtonMouseClicked
 
+    ///<summary>
+    ///Sends file
+    ///</summary>
     private void sendFileMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendFileMouseClicked
         // TODO add your handling code here:
         int returnVal = fc.showOpenDialog(this);

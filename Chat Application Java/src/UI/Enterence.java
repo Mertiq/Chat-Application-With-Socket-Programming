@@ -74,6 +74,9 @@ public class Enterence extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    ///<summary>
+    ///login
+    ///</summary>
     private void loginButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginButtonMouseClicked
         // TODO add your handling code here:
         client = new Client("127.0.0.1", 5000,inputNameField.getText());

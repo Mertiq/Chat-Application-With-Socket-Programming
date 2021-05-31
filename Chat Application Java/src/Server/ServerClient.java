@@ -13,6 +13,10 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import Message.Message;
+import Message.Message.Message_Type;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -71,26 +75,19 @@ class Listen extends Thread {
                             Server.CreateChat(client.id, Integer.parseInt(receivedMessage.content.toString()));
                         case SendChatMessage:
                             Server.SendChatMessage(receivedMessage);
-                            break;
-                        case CreateChatRoom:
-                            Server.CreateChatRoom((ArrayList<FakeClient>)receivedMessage.content);
-                            System.out.println("2-server client 77 ");
-                            break;
-                        case GetChatRoomsInfo:
                             for (ServerClient _client : Server.clients) {
-                                Server.ShowChatRooms(_client); 
+                                Server.ShowClients(_client); 
                             }
-                             System.out.println("GetChatRoomsInfo");
                             break;
+                        case SendFile:
+                            Server.Send(client,receivedMessage);
+                            break;  
                     }   
                     
-                } catch (IOException ex) {
+                } catch (IOException | ClassNotFoundException ex) {
                     Logger.getLogger(ServerClient.class.getName()).log(Level.SEVERE, null, ex);
                     Server.clients.remove(client);
 
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(ServerClient.class.getName()).log(Level.SEVERE, null, ex);
-                    Server.clients.remove(client);
                 }
             }
 

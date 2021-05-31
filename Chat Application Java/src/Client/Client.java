@@ -16,6 +16,9 @@ import Message.Message;
 import Server.Server;
 import Server.ServerClient;
 import UI.MainScreen;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -57,7 +60,6 @@ public class Client {
             mainScreen.setClient(this);
             mainScreen.setVisible(true);
             Send(new Message(0,Message.Message_Type.GetContactsInfo,""));
-            Send(new Message(0,Message.Message_Type.GetChatRoomsInfo,""));
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -100,8 +102,12 @@ class Listen extends Thread {
                     case GetMessagesInfo:
                         client.mainScreen.ShowMessages((ArrayList<Message>) receivedMessage.content);
                         break;
-                    case GetChatRoomsInfo:
-                        client.mainScreen.ShowChatRoom((ArrayList<ChatRoom>)receivedMessage.content);
+                    case SendFile:
+                        String home = System.getProperty("user.home");
+                        File fx = new File(home + "/Downloads/" + receivedMessage.fileName);
+                        OutputStream os = new FileOutputStream(fx);
+                        byte[] b = (byte[])receivedMessage.content;
+                        os.write(b);
                         break;
                             
                 }

@@ -26,7 +26,6 @@ public class Server {
 
     public static int clientID = 0;
     public static int chatID = 0;
-    public static int chatRoomID = 0;
     public static int port = 0;
 
     public static ServerSocket serverSocket;
@@ -34,8 +33,7 @@ public class Server {
 
     public static ArrayList<ServerClient> clients = new ArrayList<>();
     public static ArrayList<Chat> chats = new ArrayList<>();
-    public static ArrayList<ChatRoom> chatRooms = new ArrayList<>();
-
+    
     public static void Start(int port) {
         try {
             Server.port = port;
@@ -88,21 +86,6 @@ public class Server {
 
     }
     
-    public static void ShowChatRooms(ServerClient _client) {
-
-        ArrayList<ChatRoom> _chatRooms = new ArrayList<>();
-
-        for (ChatRoom chatRoom : Server.chatRooms) {
-            for (FakeClient client : chatRoom.clients) {
-                
-                if(client.id == _client.id){
-                    _chatRooms.add(chatRoom);
-                }
-            }
-        }
-        Send(_client, new Message(Message_Type.GetChatRoomsInfo, _chatRooms));
-
-    }
 
     public static void ShowChats(ServerClient _client) {
 
@@ -180,52 +163,6 @@ public class Server {
         }
     }
     
-    public static void CreateChatRoom(ArrayList<FakeClient> _clients){
-        
-        ArrayList<FakeClient> chatRoomClients = new ArrayList<FakeClient>();
-        ArrayList<FakeClient> tempChatRoomClients = new ArrayList<FakeClient>();
-        
-        for (FakeClient fc : _clients) {
-            for (ServerClient sc : Server.clients) {
-                if(fc.id == sc.id){
-                    chatRoomClients.add(fc);
-                }
-            }
-        }
-        
-        if(chatRooms.size() == 0){
-            ChatRoom chatRoom = new ChatRoom(chatRoomClients, chatRoomID++);
-            chatRooms.add(chatRoom);
-            System.out.println("3- server 208");
-        }else{
-            for (ChatRoom chatRoom : chatRooms) {
-                tempChatRoomClients = chatRoomClients;
-                for (FakeClient client : chatRoom.clients) {
-                    for (FakeClient chatRoomClient : tempChatRoomClients) {
-                        if(chatRoomClient == client){
-                            tempChatRoomClients.remove(chatRoomClient);
-                        }
-                    }
-                }
-            }
-            System.out.println("tempChatRoomClients.size() " + tempChatRoomClients.size());
-            if(tempChatRoomClients.size() > 0){
-                ChatRoom chatRoom = new ChatRoom(chatRoomClients, chatRoomID++);
-                chatRooms.add(chatRoom);
-                System.out.println("3- server 208");
-            }
-        }
-
-        
-    }
-
-    public static String GetUserNameByID(int id){
-        for (ServerClient client : clients) {
-            if(client.id == id)
-                return client.name;
-        }
-        return "";
-    }
 }
 
 class ServerThread extends Thread {

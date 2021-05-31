@@ -9,10 +9,19 @@ import Chat.ChatRoom;
 import Client.Client;
 import Client.FakeClient;
 import Message.Message;
+import Message.Message.Message_Type;
 import Server.Server;
 import Server.ServerClient;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -23,13 +32,14 @@ import javax.swing.event.ListSelectionListener;
  */
 public class MainScreen extends javax.swing.JFrame {
 
-    public Client client; 
-    int showContactsCounter = 0;
+    public Client client;
     String selectedClient = null;
-   
+    
+    JFileChooser fc = new JFileChooser();
     ArrayList<FakeClient> selectedClients = new ArrayList<FakeClient>();
     
     int thisClientID;
+    String thisClientName;
     /**
      * Creates new form MainScreen
      */
@@ -38,33 +48,25 @@ public class MainScreen extends javax.swing.JFrame {
     public MainScreen() {
         initComponents();
         
-        contactList.addListSelectionListener(new ListSelectionListener() {
+        
+            contactList.addListSelectionListener(new ListSelectionListener() {
        
             @Override
             public void valueChanged(ListSelectionEvent event) {
                 if (!event.getValueIsAdjusting()){
                     JList source = (JList)event.getSource();
-                    if(source.getSelectedIndices().length > 1){
-                        for (int selectedIndice : source.getSelectedIndices()) {
-                            
-                            String[] splitedString = source.getModel().getElementAt(selectedIndice).toString().split("-");
-                            selectedClients.add(new FakeClient(Integer.parseInt(splitedString[0]),splitedString[1]));
-                            
-                        }
-                        client.Send(new Message(Message.Message_Type.CreateChatRoom, selectedClients));
-                        client.Send(new Message(Message.Message_Type.GetChatRoomsInfo));
-                        System.out.println("1- main screen 54 ");
-                    }else{
-                        selectedClient = source.getSelectedValue().toString();
+                    if(source.getSelectedValue() != null){
+                        selectedClient = (String) source.getSelectedValue();
                         String[] splitedString = selectedClient.split("-");
                         client.Send(new Message(0,Message.Message_Type.CreateChat, Integer.parseInt(splitedString[0])));
-                        
                         receiverNameLabel.setText(splitedString[1]);
                     }
-                    
                 }
             }
         });
+        
+        
+      
     }
     
     public void ShowContacts(ArrayList<FakeClient> _clients){
@@ -80,35 +82,24 @@ public class MainScreen extends javax.swing.JFrame {
         
         senderNameLabel.setText(client.name);
     }
-    public void ShowChatRoom(ArrayList<ChatRoom> _chatRooms){
-        
-        System.out.println("ShowChatRoom");
-        DefaultListModel dlm = new DefaultListModel();
-        dlm.clear();
-        
-        for (ChatRoom _chatRoom : _chatRooms) {
-            String s = "";
-            for (FakeClient client1 : _chatRoom.clients) {
-                s += client1.name + ", ";
-            }
-            dlm.addElement(s);
-        }
-       
-        chatRoomList.setModel(dlm); 
-        
-    }
-    
-    
+   
     public void setClient(Client _client){
         thisClientID = _client.id;
+        thisClientName = _client.name;
         client=_client;
     }
     
     public void ShowMessages(ArrayList<Message> messages){
         String fullText = "";
         for (Message message : messages) {
-            fullText += Server.GetUserNameByID(message.fromClientID) + " : " + message.content;
-            fullText += "\n";
+            if(message.fromClientID==thisClientID){
+                fullText += thisClientName + " : " + message.content;
+                fullText += "\n";
+            }else{
+                fullText += receiverNameLabel.getText() + " : " + message.content;
+                fullText += "\n";
+            }
+            
         }
         showMessagesArea.setText(fullText);
     }
@@ -124,16 +115,14 @@ public class MainScreen extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         contactList = new javax.swing.JList<>();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        chatRoomList = new javax.swing.JList<>();
         receiverNameLabel = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         showMessagesArea = new javax.swing.JTextArea();
         inputMessageField = new javax.swing.JTextField();
         sendMessageButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         senderNameLabel = new javax.swing.JLabel();
+        sendFile = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -143,13 +132,6 @@ public class MainScreen extends javax.swing.JFrame {
             public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane1.setViewportView(contactList);
-
-        chatRoomList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane2.setViewportView(chatRoomList);
 
         receiverNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         receiverNameLabel.setText("Name");
@@ -168,11 +150,15 @@ public class MainScreen extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Online Users");
 
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Chat Rooms");
-
         senderNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         senderNameLabel.setText("Name");
+
+        sendFile.setText("File");
+        sendFile.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                sendFileMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -181,21 +167,21 @@ public class MainScreen extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(inputMessageField, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(sendMessageButton, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(receiverNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(senderNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(senderNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(inputMessageField, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sendFile, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(sendMessageButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -204,7 +190,7 @@ public class MainScreen extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(34, 34, 34)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -212,19 +198,16 @@ public class MainScreen extends javax.swing.JFrame {
                             .addComponent(senderNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sendMessageButton, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
-                            .addComponent(inputMessageField))))
-                .addGap(61, 61, 61))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(sendFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
+                            .addComponent(inputMessageField, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sendMessageButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addGap(46, 46, 46))
         );
 
         pack();
@@ -232,12 +215,44 @@ public class MainScreen extends javax.swing.JFrame {
 
     private void sendMessageButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendMessageButtonMouseClicked
         // TODO add your handling code here:
+       
         if(selectedClient != null && inputMessageField.getText() != null){
             String[] splitedString = selectedClient.split("-");
             client.Send(new Message(thisClientID,Integer.parseInt(splitedString[0]),Message.Message_Type.SendChatMessage, inputMessageField.getText()));
             inputMessageField.setText("");
         }
     }//GEN-LAST:event_sendMessageButtonMouseClicked
+
+    private void sendFileMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sendFileMouseClicked
+        // TODO add your handling code here:
+        int returnVal = fc.showOpenDialog(this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            
+            byte[] b = new byte[(int)file.length()];
+            try {
+                FileInputStream fis = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                bis.read(b,0,b.length);
+                client.Send(new Message(Message_Type.SendFile, b, file.getName()));
+                String[] splitedString = selectedClient.split("-");
+                client.Send(new Message(thisClientID,Integer.parseInt(splitedString[0]),Message.Message_Type.SendChatMessage, file.getName() + " dosyası paylaşıldı"));
+            
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+           
+            System.out.println(file.getAbsolutePath());
+        } else {
+            
+        }
+        
+    }//GEN-LAST:event_sendFileMouseClicked
 
     /**
      * @param args the command line arguments
@@ -269,25 +284,23 @@ public class MainScreen extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        /*
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MainScreen().setVisible(true);
             }
         });
-*/
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JList<String> chatRoomList;
     public javax.swing.JList<String> contactList;
     private javax.swing.JTextField inputMessageField;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel receiverNameLabel;
+    private javax.swing.JButton sendFile;
     private javax.swing.JButton sendMessageButton;
     private javax.swing.JLabel senderNameLabel;
     private javax.swing.JTextArea showMessagesArea;

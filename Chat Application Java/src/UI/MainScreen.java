@@ -32,7 +32,6 @@ public class MainScreen extends javax.swing.JFrame {
     public Client client;
     String selectedClient = null;
     
-    JFileChooser fc = new JFileChooser();
     ArrayList<FakeClient> selectedClients = new ArrayList<FakeClient>();
     
     int thisClientID;
@@ -229,6 +228,7 @@ public class MainScreen extends javax.swing.JFrame {
         
     }//GEN-LAST:event_sendMessageButtonMouseClicked
 
+    JFileChooser fc = new JFileChooser();
     ///<summary>
     ///Sends file
     ///</summary>

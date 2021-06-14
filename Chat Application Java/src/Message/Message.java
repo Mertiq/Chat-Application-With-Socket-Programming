@@ -24,11 +24,13 @@ public class Message implements java.io.Serializable {
     public int toClientID;
     public ArrayList<FakeClient> toClientIDs;
     
-    public Message(Message_Type type, Object content, String _fileName)
+    public Message(int _fromClientID, int _toClientID, Message_Type type, Object content, String _fileName)
     {
         this.type=type;
         this.content = content;
         this.fileName = _fileName;
+        this.fromClientID = _fromClientID;
+        this.toClientID = _toClientID;
     }
      
     public Message(int id, Message_Type type, Object content)

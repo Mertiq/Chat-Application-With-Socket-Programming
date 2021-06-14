@@ -73,7 +73,7 @@ class Listen extends Thread {
                         }
                         break;
                     case SendFile:
-                        Server.Send(client,receivedMessage);                                                    //calls Send metodh of Server
+                        Server.SendFile(receivedMessage);                                                    //calls Send metodh of Server
                         break;  
                 }
             } catch (IOException | ClassNotFoundException ex) {

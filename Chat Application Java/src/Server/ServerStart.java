@@ -10,9 +10,10 @@ package Server;
  * @author Mert
  */
 public class ServerStart {
+    /*
     public static void main(String[] args) {
 
         Server.Start(5000);
 
-    }
+    }*/
 }

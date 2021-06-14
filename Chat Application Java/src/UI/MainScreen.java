@@ -244,8 +244,8 @@ public class MainScreen extends javax.swing.JFrame {
                 FileInputStream fis = new FileInputStream(file);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 bis.read(b,0,b.length);
-                client.Send(new Message(Message_Type.SendFile, b, file.getName()));
                 String[] splitedString = selectedClient.split("-");
+                client.Send(new Message(thisClientID,Integer.parseInt(splitedString[0]),Message_Type.SendFile, b, file.getName()));
                 client.Send(new Message(thisClientID,Integer.parseInt(splitedString[0]),Message.Message_Type.SendChatMessage, file.getName() + " dosyası paylaşıldı"));
             
             } catch (FileNotFoundException ex) {
@@ -293,12 +293,12 @@ public class MainScreen extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        
+        /*
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MainScreen().setVisible(true);
             }
-        });
+        });*/
 
     }
 

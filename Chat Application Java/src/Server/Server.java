@@ -185,6 +185,19 @@ public class Server {
         }
     }
     
+    public static void SendFile(Message message){
+        ServerClient sc1 = null;
+        ServerClient sc2 = null;
+
+        for (ServerClient client : Server.clients) {
+            if (client.id == message.toClientID) {
+                sc2 = client;
+            }
+        }
+        
+        Send(sc2, message);
+          
+    }
 }
 
 class ServerThread extends Thread {
